@@ -62,7 +62,7 @@ public class MainAction extends AnAction {
     }
 
     /**
-     * 字符串转换(e.g. “a.user_name, b.user_age” 被转换成 "a.user_name userName, b.user_age userAge”)
+     * 字符串转换(e.g. “user_name, b.user_age” 被转换成 "user_name userName, b.user_age userAge”)
      *
      * @param originString 原来的文本
      * @return 转换后的字符串
@@ -74,12 +74,7 @@ public class MainAction extends AnAction {
                 .omitEmptyStrings()
                 .split(originString))
                 .map(s -> s + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
-                        Iterators.get(Splitter.on(".").split(s).iterator(), 1)))
+                        Iterators.getLast(Splitter.on(".").split(s).iterator())))
                 .collect(Collectors.joining(", "));
-    }
-
-    public static void main(String[] args) {
-        final String str = "a.user_name, b.user_age, ab.user_real_sex";
-        System.out.println(convert(str));
     }
 }

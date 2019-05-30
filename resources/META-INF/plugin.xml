@@ -5,7 +5,7 @@
     <vendor email="codethereforam@gmail.com" url="http://www.cnblogs.com/thinkam">thinkam</vendor>
 
     <description>
-        给SQL查询语句字段添加驼峰别名，右键选中的文本，可以将“a.foo_bar, b.foo_foo_bar”转换"a.foo_bar fooBar, b.foo_foo_bar fooFooBar”
+        给SQL查询语句字段添加驼峰别名，右键选中的文本，可以将“foo_bar, b.foo_foo_bar”转换"foo_bar fooBar, b.foo_foo_bar fooFooBar”
     </description>
 
     <idea-version since-build="173.0"/>
