@@ -23,6 +23,10 @@ import java.util.stream.Collectors;
  * @date 2019/5/30 22:46
  */
 public class MainAction extends AnAction {
+    /**
+     * " "
+     */
+    public static final String SPACE_STRING = " ";
 
     /**
      * 替换用户选择的文本
@@ -73,8 +77,15 @@ public class MainAction extends AnAction {
         return Streams.stream(Splitter.on(",").trimResults()
                 .omitEmptyStrings()
                 .split(originString))
-                .map(s -> s + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
-                        Iterators.getLast(Splitter.on(".").split(s).iterator())))
+                .map(MainAction::addCamelBehind)
                 .collect(Collectors.joining(", "));
+    }
+
+    private static String addCamelBehind(String s) {
+        if (s.contains(SPACE_STRING)) {
+            return s;
+        }
+        return s + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
+                Iterators.getLast(Splitter.on(".").split(s).iterator()));
     }
 }
