@@ -12,7 +12,7 @@
 
     <actions>
         <action id="MainAction"
-                class="priv.thinkam.plugins.MainAction"
+                class="MainAction"
                 text="sql alias CamelCase"
                 description="给SQL查询语句字段添加驼峰别名">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
