@@ -1,9 +1,5 @@
 package priv.thinkam.plugins;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Streams;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -13,8 +9,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 
-import java.util.stream.Collectors;
-
 /**
  * 给SQL查询语句字段添加驼峰别名
  *
@@ -23,10 +17,7 @@ import java.util.stream.Collectors;
  * @date 2019/5/30 22:46
  */
 public class MainAction extends AnAction {
-    /**
-     * " "
-     */
-    public static final String SPACE_STRING = " ";
+    private Converter converter = new SqlAliasCamelConverter();
 
     /**
      * 替换用户选择的文本
@@ -46,7 +37,7 @@ public class MainAction extends AnAction {
         final int end = selectionModel.getSelectionEnd();
         //Making the replacement
         WriteCommandAction.runWriteCommandAction(project, () ->
-                document.replaceString(start, end, convert(selectionModel.getSelectedText()))
+                document.replaceString(start, end, converter.convert(selectionModel.getSelectedText()))
         );
         selectionModel.removeSelection();
     }
@@ -63,29 +54,5 @@ public class MainAction extends AnAction {
         final Editor editor = e.getData(CommonDataKeys.EDITOR);
         //Set visibility only in case of existing project and editor and if some text in the editor is selected
         e.getPresentation().setVisible((project != null && editor != null && editor.getSelectionModel().hasSelection()));
-    }
-
-    /**
-     * 字符串转换(e.g. “user_name, b.user_age” 被转换成 "user_name userName, b.user_age userAge”)
-     *
-     * @param originString 原来的文本
-     * @return 转换后的字符串
-     * @author thinkam
-     * @date 2019/5/30 22:48
-     */
-    private static String convert(String originString) {
-        return Streams.stream(Splitter.on(",").trimResults()
-                .omitEmptyStrings()
-                .split(originString))
-                .map(MainAction::addCamelBehind)
-                .collect(Collectors.joining(", "));
-    }
-
-    private static String addCamelBehind(String s) {
-        if (s.contains(SPACE_STRING)) {
-            return s;
-        }
-        return s + " " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
-                Iterators.getLast(Splitter.on(".").split(s).iterator()));
     }
 }
