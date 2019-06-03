@@ -8,17 +8,16 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
+import org.apache.commons.lang.StringUtils;
 
 /**
- * 给SQL查询语句字段添加驼峰别名
+ * 转换例如'// abc'和'/* abc *{@literal /}'形式的单行注释为javadoc注释
  *
  * @author thinkam
  * @author Anna Bulenkova
  * @date 2019/5/30 22:46
  */
 public class MainAction extends AnAction {
-    private Converter converter = new SqlAliasCamelConverter();
-
     /**
      * 替换用户选择的文本
      *
@@ -32,18 +31,18 @@ public class MainAction extends AnAction {
         //Access document, caret, and selection
         final Document document = editor.getDocument();
         final SelectionModel selectionModel = editor.getSelectionModel();
-
+        selectionModel.selectLineAtCaret();
         final int start = selectionModel.getSelectionStart();
         final int end = selectionModel.getSelectionEnd();
         //Making the replacement
         WriteCommandAction.runWriteCommandAction(project, () ->
-                document.replaceString(start, end, converter.convert(selectionModel.getSelectedText()))
+                document.replaceString(start, end, convert(selectionModel.getSelectedText(), start))
         );
         selectionModel.removeSelection();
     }
 
     /**
-     * 当有文本被选中时右键才显示改插件的菜单
+     * 编辑状态可见
      *
      * @param e AnActionEvent
      */
@@ -52,7 +51,14 @@ public class MainAction extends AnAction {
         //Get required data keys
         final Project project = e.getProject();
         final Editor editor = e.getData(CommonDataKeys.EDITOR);
-        //Set visibility only in case of existing project and editor and if some text in the editor is selected
-        e.getPresentation().setVisible((project != null && editor != null && editor.getSelectionModel().hasSelection()));
+        //Set visibility only in case of existing project and editor
+        e.getPresentation().setVisible((project != null && editor != null));
+    }
+
+    private static String convert(String originalString, int start) {
+        String commentText = StringUtils.strip(StringUtils.trim(originalString), "/* ");
+        return "\t/**\n" +
+                "\t" + "* " + commentText + "\n" +
+                "\t" + "*/\n";
     }
 }
